@@ -8,6 +8,7 @@ import (
 type UserService interface {
 	GetAllUsers() ([]models.User, error)
 	GetUserById(id uint) (models.User, error)
+	FindUsersByEmail(email string) ([]models.User, error)
 	CreateUser(user models.User) (models.User, error)
 	UpdateUser(user models.User) (models.User, error)
 	DeleteUser(id uint) error
@@ -27,6 +28,10 @@ func (s *UserServiceImpl) GetAllUsers() ([]models.User, error) {
 
 func (s *UserServiceImpl) GetUserById(id uint) (models.User, error) {
 	return s.repo.GetUserById(id)
+}
+
+func (s *UserServiceImpl) FindUsersByEmail(email string) ([]models.User, error) {
+	return s.repo.FindUsersByEmail(email)
 }
 
 func (s *UserServiceImpl) CreateUser(user models.User) (models.User, error) {

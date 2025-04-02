@@ -42,6 +42,17 @@ func (ctrl *UserController) GetUserById(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
+func (ctrl *UserController) GetUsersByEmail(c *gin.Context) {
+	email := c.Query("email")
+
+	users, err := ctrl.userService.FindUsersByEmail(email)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, users)
+}
+
 func (ctrl *UserController) CreateUser(c *gin.Context) {
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {

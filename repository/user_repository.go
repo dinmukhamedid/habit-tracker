@@ -8,6 +8,7 @@ import (
 type UserRepository interface {
 	GetAllUsers() ([]models.User, error)
 	GetUserById(id uint) (models.User, error)
+	FindUsersByEmail(email string) ([]models.User, error)
 	CreateUser(user models.User) (models.User, error)
 	UpdateUser(user models.User) (models.User, error)
 	DeleteUser(id uint) error
@@ -25,6 +26,12 @@ func (r *UserRepo) GetUserById(id uint) (models.User, error) {
 	var user models.User
 	result := config.DB.First(&user, id)
 	return user, result.Error
+}
+
+func (r *UserRepo) FindUsersByEmail(email string) ([]models.User, error) {
+	var users []models.User
+	result := config.DB.Where("email = ?", email).Find(&users)
+	return users, result.Error
 }
 
 func (r *UserRepo) CreateUser(user models.User) (models.User, error) {

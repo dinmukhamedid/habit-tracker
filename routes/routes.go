@@ -8,9 +8,10 @@ import (
 
 func SetupRouter(userController *controllers.UserController) *gin.Engine {
 	r := gin.Default()
-	
+
 	r.GET("/users", userController.GetAllUsers)
 	r.GET("/users/:id", userController.GetUserById)
+	r.GET("/users/search", userController.GetUsersByEmail)
 	r.POST("/users", userController.CreateUser)
 	r.PUT("/users/:id", userController.UpdateUser)
 	r.DELETE("/users/:id", userController.DeleteUser)
