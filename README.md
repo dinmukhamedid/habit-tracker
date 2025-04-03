@@ -28,6 +28,9 @@ POST	/users	                  Жаңа пайдаланушы қосу	         
 PUT	/users/:id	                Пайдаланушы деректерін жаңарту	                     ✅ { "name": "Arman", "email": "Arman@example.com", "age": 20 }
 DELETE	/users/:id	            Пайдаланушыны жою	                                   ❌
 
+![image](https://github.com/user-attachments/assets/1865d071-59b0-41b8-99e0-1dc051d1cd59)
+
+
 
 
 💾 GORM (ORM) қалай жұмыс істейді?
