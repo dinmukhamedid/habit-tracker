@@ -1,5 +1,5 @@
-📌 Habit Tracker API
-📝 Жоба сипаттамасы
+## 📌 Habit Tracker
+
 Бұл жоба әдеттерді бақылау(habit-tracker) жүйесі үшін REST API ұсынады. Ол Golang, Gin, GORM және PostgreSQL көмегімен жасалған.
 
 🛠 Қолданылған технологиялар
