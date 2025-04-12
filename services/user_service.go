@@ -1,8 +1,11 @@
 package services
 
 import (
+	"habit-tracker/config"
 	"habit-tracker/models"
 	"habit-tracker/repository"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService interface {
@@ -11,6 +14,8 @@ type UserService interface {
 	CreateUser(user models.User) (models.User, error)
 	UpdateUser(user models.User) (models.User, error)
 	DeleteUser(id uint) error
+	Register(user models.User) (models.User, error)    // Қосыңыз
+	Login(email, password string) (models.User, error) // Қосыңыз
 }
 
 type UserServiceImpl struct {
@@ -39,4 +44,26 @@ func (s *UserServiceImpl) UpdateUser(user models.User) (models.User, error) {
 
 func (s *UserServiceImpl) DeleteUser(id uint) error {
 	return s.repo.DeleteUser(id)
+}
+
+// Парольді хэштеу және қолданушыны сақтау
+func (s *UserServiceImpl) Register(user models.User) (models.User, error) {
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return user, err
+	}
+	user.Password = string(hashedPassword)
+	err = config.DB.Create(&user).Error
+	return user, err
+}
+
+// Email арқылы қолданушыны табу және парольді тексеру
+func (s *UserServiceImpl) Login(email, password string) (models.User, error) {
+	var user models.User
+	err := config.DB.Where("email = ?", email).First(&user).Error
+	if err != nil {
+		return user, err
+	}
+	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
+	return user, err
 }

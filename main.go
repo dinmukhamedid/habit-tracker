@@ -9,13 +9,27 @@ import (
 )
 
 func main() {
+	// Базаға қосылу
 	config.ConnectDatabase()
 
-	userRepo := &repository.UserRepo{}
+	// User сервисі мен контроллерін инициализациялау
+	userRepo := repository.NewUserRepo(config.DB)
 	userService := services.NewUserService(userRepo)
-	userController := controllers.NewUserController(userService)
+	authService := services.NewAuthService()
+	authController := controllers.NewAuthController(userService, authService)
 
-	r := routes.SetupRouter(userController)
-	
+	// Habit сервисі мен контроллерін инициализациялау
+	habitRepo := repository.NewHabitRepo(config.DB)
+	habitService := services.NewHabitService(habitRepo)
+	habitController := controllers.NewHabitController(habitService)
+
+	// Маршрутизаторды инициализациялау
+	r := routes.SetupRouter(
+		controllers.NewUserController(userService),
+		habitController,
+		authController,
+	)
+
+	// Серверді іске қосу
 	r.Run(":8080")
 }
