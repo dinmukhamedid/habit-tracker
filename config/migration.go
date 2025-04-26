@@ -10,7 +10,7 @@ import (
 )
 
 func RunMigrations(db *gorm.DB) {
-	sqlBytes, err := ioutil.ReadFile("migration/1_init_tables.sql")
+	sqlBytes, err := ioutil.ReadFile("config/migration/1_init_tables.sql")
 	if err != nil {
 		log.Fatalf("Миграция файлын оқу қатесі: %v", err)
 	}

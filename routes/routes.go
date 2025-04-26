@@ -24,6 +24,7 @@ func SetupRouter(
 	r.GET("/habits", habitController.GetAllHabits)
 	r.GET("/habits/user/:userId", habitController.GetHabitsByUserId)
 	r.POST("/habits", habitController.CreateHabit)
+	r.DELETE("/habits/:id", habitController.DeleteHabit)
 
 	// Auth маршруттары
 	r.POST("/register", authController.Register)

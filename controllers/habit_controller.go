@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"errors"
+	"gorm.io/gorm"
 	"habit-tracker/config"
 	"habit-tracker/models"
 	"habit-tracker/services"
@@ -33,9 +35,8 @@ func (ctrl *HabitController) CreateHabit(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdHabit)
 }
 
-func (h *HabitController) GetAllHabits(c *gin.Context) {
-	// Пайдаланушының ID-ін және рөлін алу
-	userID, _ := c.Get("userID") // Middleware-ден алынады
+func (ctrl *HabitController) GetAllHabits(c *gin.Context) {
+	userID, _ := c.Get("user_id") // Middleware-дан алынады
 	role, _ := c.Get("role")
 
 	var habits []models.Habit
@@ -47,7 +48,7 @@ func (h *HabitController) GetAllHabits(c *gin.Context) {
 		config.DB.Where("user_id = ?", userID).Find(&habits)
 	}
 
-	c.JSON(200, habits)
+	c.JSON(http.StatusOK, habits)
 }
 
 func (ctrl *HabitController) GetHabitsByUserId(c *gin.Context) {
@@ -68,22 +69,35 @@ func (ctrl *HabitController) GetHabitsByUserId(c *gin.Context) {
 
 func (h *HabitController) DeleteHabit(c *gin.Context) {
 	habitID := c.Param("id")
-	userID, _ := c.Get("userID") // Middleware-ден алынады
-	role, _ := c.Get("role")
+
+	// ID-ді uint-ке түрлендіру
+	id, err := strconv.ParseUint(habitID, 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid habit ID"})
+		return
+	}
 
 	var habit models.Habit
-	if err := config.DB.First(&habit, habitID).Error; err != nil {
-		c.JSON(404, gin.H{"error": "Habit not found"})
+	result := config.DB.First(&habit, id)
+	if result.Error != nil {
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Habit not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch habit"})
 		return
 	}
 
 	// Рөлді тексеру
+	userID, _ := c.Get("user_id")
+	role, _ := c.Get("role")
+
 	if role != "admin" && habit.UserID != userID.(uint) {
-		c.JSON(403, gin.H{"error": "Forbidden"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "Forbidden"})
 		return
 	}
 
 	// Привычканы өшіру
 	config.DB.Delete(&habit)
-	c.JSON(200, gin.H{"message": "Habit deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Habit deleted successfully"})
 }
